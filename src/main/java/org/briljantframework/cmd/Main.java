@@ -1,5 +1,8 @@
 package org.briljantframework.cmd;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -55,9 +58,33 @@ public class Main {
   }
 
   public static void main(String[] args) {
-//    args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
-//        "/Users/isak/Projects/rsf-cmdline/dataset/Trace/Trace_TRAIN",
-//        "/Users/isak/Projects/rsf-cmdline/dataset/Trace/Trace_TEST"};
+    //args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
+    //        "dataset/synthetic_control/synthetic_control_TRAIN",
+    //        "dataset/synthetic_control/synthetic_control_TEST"};
+
+
+    try {
+      String csvFilename = "/tmp/test3/indexOutput.csv";
+      FileReader csvReader = new FileReader(csvFilename);
+      BufferedReader bufferedReader = new BufferedReader(csvReader);
+      String line = null;
+      while ((line = bufferedReader.readLine()) != null){
+        String[] lineData = line.split(";");
+        for (String data : lineData) {
+          System.out.print(data + "\t");
+        }
+        System.out.println();
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    System.exit(0);
+
+    args = new String[] {"-p", "dataset/synthetic_control/synthetic_control_TRAIN",
+            "dataset/synthetic_control/synthetic_control_TEST"};
 
     // String s = "-r 10 -s 0.3 -m -w /Users/isak/Downloads/dataSets/Cricket/xleft.txt
     // /Users/isak/Downloads/dataSets/Cricket/xright.txt
@@ -282,10 +309,10 @@ public class Main {
         for (int i = 0; i < shapelets.size(); i++) {
           System.out.print(i + "\t");
           Shapelet shapelet = shapelets.get(i).getShapelet();
-          for (int j = 0; j < shapelet.size(); j++) {
+          /*for (int j = 0; j < shapelet.size(); j++) {
             System.out.print(shapelet.getDouble(j) + " ");
-          }
-          System.out.println();
+          }*/
+          System.out.println(shapelet.size());
         }
       }
 
