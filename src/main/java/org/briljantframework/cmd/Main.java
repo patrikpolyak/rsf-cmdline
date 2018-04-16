@@ -129,7 +129,7 @@ public class Main {
             }
           };
 
-      Pair<Input<MultivariateTimeSeries>, Output<Objec  t>> train;
+      Pair<Input<MultivariateTimeSeries>, Output<Object>> train;
       ClassifierValidator<MultivariateTimeSeries, Object> validator;
       if (cmd.hasOption("c") || cmd.hasOption("s")) {
         Input<MultivariateTimeSeries> t = new ArrayInput<>();
