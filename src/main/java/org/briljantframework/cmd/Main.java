@@ -81,9 +81,8 @@ public class Main {
       e.printStackTrace();
     }
 
-    System.exit(0);
 
-    args = new String[] {"-p", "dataset/synthetic_control/synthetic_control_TRAIN",
+    args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
             "dataset/synthetic_control/synthetic_control_TEST"};
 
     // String s = "-r 10 -s 0.3 -m -w /Users/isak/Downloads/dataSets/Cricket/xleft.txt
@@ -130,7 +129,7 @@ public class Main {
             }
           };
 
-      Pair<Input<MultivariateTimeSeries>, Output<Object>> train;
+      Pair<Input<MultivariateTimeSeries>, Output<Objec  t>> train;
       ClassifierValidator<MultivariateTimeSeries, Object> validator;
       if (cmd.hasOption("c") || cmd.hasOption("s")) {
         Input<MultivariateTimeSeries> t = new ArrayInput<>();
