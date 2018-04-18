@@ -77,7 +77,7 @@ public class TimeSeries implements DoubleSequence {
   }
 
   private int[] convertSax(double[] ts) {
-    int wordLen = 4; // TODO: move to global variable
+    int wordLen = 7; // TODO: move to global variable
     int card = 512; // TODO: move to global variable
     double rem = Math.IEEEremainder(ts.length, wordLen);
     double[] PAA = new double[wordLen];
@@ -88,6 +88,9 @@ public class TimeSeries implements DoubleSequence {
       // If the wordLen is not divisible by the length of time series, then
       // find their GCD (greatest common divisor) and duplicate the time
       // series by this much (one number at a time).
+      int lcm = GetLCM(ts, wordLen);
+      double[] ts_dup = DupArray(ts, lcm / ts.length);
+      PAA = getPAA(ts_dup, wordLen);
     }
     return GetSymbol(PAA, wordLen, card);
   }
@@ -168,6 +171,54 @@ public class TimeSeries implements DoubleSequence {
       FOUND = false;
     }
     return symbols;
+  }
+
+  // Get the GCD (greatest common divisor) between the
+  // length of the time series and the number of PAA
+  // segments
+  private static int GetGCD(double[] time_series, int num_seg)
+  {
+    int u = time_series.length;
+    int v = num_seg;
+    int div;
+    int divisible_check;
+
+    while (v > 0)
+    {
+      div = (int)Math.floor((double)u / (double)v);
+      divisible_check = u - v * div;
+      u = v;
+      v = divisible_check;
+    }
+    return u;
+  }
+
+  // Get the least common multiple of the length of the time series and the
+  // number of segments
+  private static int GetLCM(double[] time_series, int num_seg)
+  {
+    int gcd = GetGCD(time_series, num_seg);
+    int len = time_series.length;
+    int n = num_seg;
+    return (len * (n / gcd));
+  }
+
+  // Make dup copies of each array element (one at a time)
+  public static double[] DupArray(double[] data, int dup)
+  {
+    int cur_index = 0;
+    double[] dup_array = new double[data.length * dup];
+
+    for (int i = 0; i < data.length; i++)
+    {
+      for (int j = 0; j < dup; j++)
+      {
+        dup_array[cur_index + j] = data[i];
+      }
+
+      cur_index += dup;
+    }
+    return dup_array;
   }
 
 

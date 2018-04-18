@@ -61,7 +61,7 @@ public class Main {
     //args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
     //        "dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
-    
+
     args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
             "dataset/synthetic_control/synthetic_control_TEST"};
 
