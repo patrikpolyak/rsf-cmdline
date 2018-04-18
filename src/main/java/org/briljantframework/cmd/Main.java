@@ -1,8 +1,5 @@
 package org.briljantframework.cmd;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -29,6 +26,7 @@ import org.briljantframework.mimir.classification.tree.pattern.PatternTree;
 import org.briljantframework.mimir.classification.tree.pattern.RandomPatternForest;
 import org.briljantframework.mimir.data.*;
 import org.briljantframework.mimir.data.timeseries.MultivariateTimeSeries;
+import org.briljantframework.mimir.data.timeseries.SaxOptions;
 import org.briljantframework.mimir.data.timeseries.TimeSeries;
 import org.briljantframework.mimir.distance.EarlyAbandonSlidingDistance;
 import org.briljantframework.mimir.evaluation.Result;
@@ -85,6 +83,8 @@ public class Main {
     options.addOption("s", "split", true, "Combine datasets and use split validation");
     options.addOption("o", "optimize", false, "optimize the parameters using oob");
     options.addOption("d", "csv-delim", false, "Present the results as a comma separated list");
+    options.addOption("a", "alphabet-size", true, "Alphabet size for the SAX conversion");
+    options.addOption("w", "wordlength", true, "Word length for the SAX convsersion");
     CommandLineParser parser = new DefaultParser();
     try {
       CommandLine cmd = parser.parse(options, args);
@@ -92,6 +92,8 @@ public class Main {
       double lower = Double.parseDouble(cmd.getOptionValue("l", "0.025"));
       double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
       int r = Integer.parseInt(cmd.getOptionValue("r", "100"));
+      SaxOptions.setAlphabetSize(Integer.parseInt(cmd.getOptionValue("a", "4")));
+      SaxOptions.setWordLength(Integer.parseInt(cmd.getOptionValue("w", "8")));
       boolean print = cmd.hasOption("p");
 
       List<String> files = cmd.getArgList();

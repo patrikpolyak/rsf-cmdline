@@ -7,8 +7,26 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Breakpoints {
+public class SaxOptions {
     private static Map<Integer, double[]> breakpoints = new HashMap<Integer, double[]>();
+    private static int alphabetSize;
+    private static int wordLength;
+
+    public static int getAlphabetSize() {
+        return alphabetSize;
+    }
+
+    public static void setAlphabetSize(int alphabet_size) {
+        SaxOptions.alphabetSize = alphabet_size;
+    }
+
+    public static int getWordLength() {
+        return wordLength;
+    }
+
+    public static void setWordLength(int word_length) {
+        SaxOptions.wordLength = word_length;
+    }
 
     public static class Breakpoint {
         static {

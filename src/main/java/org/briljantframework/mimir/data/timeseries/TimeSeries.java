@@ -25,7 +25,6 @@ import org.briljantframework.DoubleSequence;
 import org.briljantframework.data.Collectors;
 import org.briljantframework.data.series.Convert;
 import org.briljantframework.data.series.Series;
-import org.briljantframework.mimir.data.timeseries.Breakpoints;
 
 import java.util.*;
 
@@ -77,14 +76,13 @@ public class TimeSeries implements DoubleSequence {
   }
 
   private int[] convertSax(double[] ts) {
-    int wordLen = 7; // TODO: move to global variable
-    int card = 512; // TODO: move to global variable
+    int wordLen = SaxOptions.getWordLength();
+    int card = SaxOptions.getAlphabetSize();
     double rem = Math.IEEEremainder(ts.length, wordLen);
     double[] PAA = new double[wordLen];
     if (rem == 0) {
       PAA = getPAA(ts, wordLen);
     } else {
-      // TODO: implement function for the case time series length is not divisible by the SAX word length
       // If the wordLen is not divisible by the length of time series, then
       // find their GCD (greatest common divisor) and duplicate the time
       // series by this much (one number at a time).
@@ -154,7 +152,7 @@ public class TimeSeries implements DoubleSequence {
     {
       for (int j = 0; j < alphabet_size - 1; j++)
       {
-        if (PAA[i] <= Breakpoints.Breakpoint.get(alphabet_size)[j])
+        if (PAA[i] <= SaxOptions.Breakpoint.get(alphabet_size)[j])
         {
           symbols[i] = j;// lowest val = 1, card 4 - 4th-j(3) = 1
           //		symbols[i] = (byte)(j + 1);
