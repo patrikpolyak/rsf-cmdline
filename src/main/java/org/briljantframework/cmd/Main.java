@@ -61,27 +61,7 @@ public class Main {
     //args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
     //        "dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
-
-
-    try {
-      String csvFilename = "/tmp/test3/indexOutput.csv";
-      FileReader csvReader = new FileReader(csvFilename);
-      BufferedReader bufferedReader = new BufferedReader(csvReader);
-      String line = null;
-      while ((line = bufferedReader.readLine()) != null){
-        String[] lineData = line.split(";");
-        for (String data : lineData) {
-          System.out.print(data + "\t");
-        }
-        System.out.println();
-      }
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-
+    
     args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
             "dataset/synthetic_control/synthetic_control_TEST"};
 
