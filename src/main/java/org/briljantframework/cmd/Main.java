@@ -28,7 +28,7 @@ import org.briljantframework.mimir.data.*;
 import org.briljantframework.mimir.data.timeseries.MultivariateTimeSeries;
 import org.briljantframework.mimir.data.timeseries.SaxOptions;
 import org.briljantframework.mimir.data.timeseries.TimeSeries;
-import org.briljantframework.mimir.distance.EarlyAbandonSlidingDistance;
+import org.briljantframework.mimir.distance.SlidingSAXDistance;
 import org.briljantframework.mimir.evaluation.Result;
 import org.briljantframework.mimir.evaluation.partition.Partition;
 import org.briljantframework.mimir.evaluation.partition.Partitioner;
@@ -73,6 +73,7 @@ public class Main {
     Options options = new Options();
 
     options.addOption("n", "no-trees", true, "Number of trees");
+    // TODO: implement fix-sized shapelet choices --> based on timeseries and shapelet SAX words lengths?
     options.addOption("l", "lower", true, "Lower shapelet size (fraction of length, e.g, 0.05)");
     options.addOption("u", "upper", true, "Upper shapelet size (fraction of length, e.g, 0.8)");
     options.addOption("r", "sample", true, "Number of shapelets");
@@ -84,7 +85,8 @@ public class Main {
     options.addOption("o", "optimize", false, "optimize the parameters using oob");
     options.addOption("d", "csv-delim", false, "Present the results as a comma separated list");
     options.addOption("a", "alphabet-size", true, "Alphabet size for the SAX conversion");
-    options.addOption("w", "wordlength", true, "Word length for the SAX convsersion");
+    options.addOption("tw", "ts-wordlength", true, "Word length for the time series SAX convsersion");
+    options.addOption("sw", "sh-wordlength", true, "Word length for the shapelet SAX convsersion");
     CommandLineParser parser = new DefaultParser();
     try {
       CommandLine cmd = parser.parse(options, args);
@@ -93,7 +95,8 @@ public class Main {
       double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
       int r = Integer.parseInt(cmd.getOptionValue("r", "100"));
       SaxOptions.setAlphabetSize(Integer.parseInt(cmd.getOptionValue("a", "4")));
-      SaxOptions.setWordLength(Integer.parseInt(cmd.getOptionValue("w", "8")));
+      SaxOptions.setTsWordLength(Integer.parseInt(cmd.getOptionValue("tw", "8")));
+      SaxOptions.setShWordLength(Integer.parseInt(cmd.getOptionValue("sw", "4")));
       boolean print = cmd.hasOption("p");
 
       List<String> files = cmd.getArgList();
@@ -102,14 +105,25 @@ public class Main {
       }
 
       // Compute the minimum distance between the shapelet and the time series
-      PatternDistance<MultivariateTimeSeries, MultivariateShapelet> patternDistance =
+      /*PatternDistance<MultivariateTimeSeries, MultivariateShapelet> patternDistance =
           new PatternDistance<MultivariateTimeSeries, MultivariateShapelet>() {
             private EarlyAbandonSlidingDistance distance = new EarlyAbandonSlidingDistance();
 
             public double computeDistance(MultivariateTimeSeries a, MultivariateShapelet b) {
               return distance.compute(a.getDimension(b.getDimension()), b.getShapelet());
             }
-          };
+          };*/
+
+      // Compute minimum SAX distance between the shapelet and the time series
+      PatternDistance<MultivariateTimeSeries, MultivariateShapelet> patternDistance =
+              new PatternDistance<MultivariateTimeSeries, MultivariateShapelet>() {
+                private SlidingSAXDistance distance = new SlidingSAXDistance();
+
+                @Override
+                public double computeDistance(MultivariateTimeSeries a, MultivariateShapelet b) {
+                  return distance.compute(a.getDimension(b.getDimension()), b.getShapelet());
+                }
+              };
 
       Pair<Input<MultivariateTimeSeries>, Output<Object>> train;
       ClassifierValidator<MultivariateTimeSeries, Object> validator;

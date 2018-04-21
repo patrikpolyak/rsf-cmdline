@@ -10,7 +10,8 @@ import java.util.Map;
 public class SaxOptions {
     private static Map<Integer, double[]> breakpoints = new HashMap<Integer, double[]>();
     private static int alphabetSize;
-    private static int wordLength;
+    private static int tsWordLength;
+    private static int shWordLength;
 
     public static int getAlphabetSize() {
         return alphabetSize;
@@ -20,12 +21,20 @@ public class SaxOptions {
         SaxOptions.alphabetSize = alphabet_size;
     }
 
-    public static int getWordLength() {
-        return wordLength;
+    public static int getTsWordLength() {
+        return tsWordLength;
     }
 
-    public static void setWordLength(int word_length) {
-        SaxOptions.wordLength = word_length;
+    public static void setTsWordLength(int word_length) {
+        SaxOptions.tsWordLength = word_length;
+    }
+
+    public static int getShWordLength() {
+        return shWordLength;
+    }
+
+    public static void setShWordLength(int shWordLength) {
+        SaxOptions.shWordLength = shWordLength;
     }
 
     public static class Breakpoint {
