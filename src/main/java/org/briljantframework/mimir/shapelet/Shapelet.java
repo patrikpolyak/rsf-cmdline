@@ -53,6 +53,7 @@ public class Shapelet implements DoubleSequence {
     this.start = start;
     this.length = length;
     this.timeSeries = timeSeries;
+    // TODO: consider z-normalizing - might be needed to do in NormalizedShapelet instead
     double[] tsArray = ((TimeSeries) timeSeries).getTimeSeries();
     double[] shapelet = Arrays.copyOfRange(tsArray, start, start + length);
     this.saxWord = Sax.convertSax(shapelet, SaxOptions.getShWordLength());

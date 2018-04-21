@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class SaxOptions {
     private static Map<Integer, double[]> breakpoints = new HashMap<Integer, double[]>();
+    private static double[][] distTable;
     private static int alphabetSize;
     private static int tsWordLength;
     private static int shWordLength;
@@ -37,6 +38,35 @@ public class SaxOptions {
         SaxOptions.shWordLength = shWordLength;
     }
 
+    public static double[][] getDistTable() {
+        return distTable;
+    }
+
+    public static void generateDistTable(int alphabetSize) {
+        distTable = new double[alphabetSize][alphabetSize];
+        double[] breakpointTable = SaxOptions.Breakpoint.get(alphabetSize);
+        for (int r = 0; r < alphabetSize; r++) {
+            for (int c = 0; c < alphabetSize; c++) {
+                if (Math.abs(r-c) <= 1) {
+                    distTable[r][c] = 0;
+                } else {
+                    distTable[r][c] = breakpointTable[(Math.max(r, c) - 1)] - breakpointTable[(Math.min(r, c) - 0)];
+                }
+            }
+        }
+    }
+
+    /*
+    Could be replaced by the following as suggested by http://www.cs.ucr.edu/~eamonn/SAX.htm
+    startRange = 2;
+    stdc= 1;
+    endRange = 512;
+
+    table = cell(endRange-startRange,1);
+    for r=startRange:endRange
+        table{r-startRange+1} = norminv((1:r-1)/r,0,stdc);
+    end
+     */
     public static class Breakpoint {
         static {
             Integer index;
@@ -61,10 +91,12 @@ public class SaxOptions {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
 
         public static double[] get(int alphabet_size) {
             return breakpoints.get(alphabet_size);
         }
+
     }
 }
