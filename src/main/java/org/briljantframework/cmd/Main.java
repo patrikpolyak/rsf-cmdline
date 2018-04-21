@@ -95,7 +95,7 @@ public class Main {
       double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
       int r = Integer.parseInt(cmd.getOptionValue("r", "100"));
       SaxOptions.setAlphabetSize(Integer.parseInt(cmd.getOptionValue("a", "8")));
-      SaxOptions.setTsWordLength(Integer.parseInt(cmd.getOptionValue("tw", "4")));
+      SaxOptions.setTsWordLength(Integer.parseInt(cmd.getOptionValue("tw", "8")));
       SaxOptions.setShWordLength(Integer.parseInt(cmd.getOptionValue("sw", "4")));
       SaxOptions.generateDistTable(SaxOptions.getAlphabetSize());
       boolean print = cmd.hasOption("p");
