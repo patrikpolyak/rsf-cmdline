@@ -47,16 +47,16 @@ public class Shapelet implements DoubleSequence {
 
   private final DoubleSequence timeSeries;
   private final int start, length;
-  private int[] saxWord;
+  //private int[] saxWord;
 
   public Shapelet(int start, int length, DoubleSequence timeSeries) {
     this.start = start;
     this.length = length;
     this.timeSeries = timeSeries;
-    // TODO: consider z-normalizing - might be needed to do in NormalizedShapelet instead
-    double[] tsArray = ((TimeSeries) timeSeries).getTimeSeries();
+    // Removed with the implementation of z-normalized shapelet calculations
+    /*double[] tsArray = ((TimeSeries) timeSeries).getTimeSeries();
     double[] shapelet = Arrays.copyOfRange(tsArray, start, start + length);
-    this.saxWord = Sax.convertSax(shapelet, SaxOptions.getShWordLength());
+    this.saxWord = Sax.convertSax(shapelet, SaxOptions.getShWordLength());*/
   }
 
   /**
@@ -99,5 +99,5 @@ public class Shapelet implements DoubleSequence {
   // return String.format("Shapelet(%s, shape=(%d, 1))", r, size());
   // }
 
-  public int[] getSaxWord() { return this.saxWord; }
+  //public int[] getSaxWord() { return this.saxWord; }
 }

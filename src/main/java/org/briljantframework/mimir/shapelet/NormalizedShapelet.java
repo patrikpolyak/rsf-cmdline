@@ -21,6 +21,8 @@
 package org.briljantframework.mimir.shapelet;
 
 import org.briljantframework.DoubleSequence;
+import org.briljantframework.mimir.data.timeseries.Sax;
+import org.briljantframework.mimir.data.timeseries.SaxOptions;
 
 /**
  * A z-normalized sub sequence view of another MatrixLike
@@ -31,9 +33,11 @@ public class NormalizedShapelet extends Shapelet {
 
   private final double sigma;
   private final double mean;
+  private int[] normalizedSaxWord;
 
   public NormalizedShapelet(int start, int length, DoubleSequence timeSeries) {
     super(start, length, timeSeries);
+    double[] shapelet = new double[length];
     if (timeSeries instanceof NormalizedShapelet) {
       this.sigma = ((NormalizedShapelet) timeSeries).sigma;
       this.mean = ((NormalizedShapelet) timeSeries).mean;
@@ -52,6 +56,11 @@ public class NormalizedShapelet extends Shapelet {
       } else {
         this.sigma = Math.sqrt(ex2 / length - mean * mean);
       }
+
+      for (int i = 0; i < length; i++) {
+        shapelet[i] = (timeSeries.getDouble(start + i) - mean) / sigma;
+      }
+      this.normalizedSaxWord = Sax.convertSax(shapelet, SaxOptions.getShWordLength());
     }
   }
 
@@ -63,4 +72,6 @@ public class NormalizedShapelet extends Shapelet {
       return (super.getDouble(i) - mean) / sigma;
     }
   }
+
+  public int[] getNormalizedSaxWord() { return this.normalizedSaxWord; }
 }
