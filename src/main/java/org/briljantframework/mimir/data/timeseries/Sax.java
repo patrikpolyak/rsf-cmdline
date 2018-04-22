@@ -1,6 +1,7 @@
 package org.briljantframework.mimir.data.timeseries;
 
 public class Sax {
+    // TODO: to support variable shapelet sizes, change from wordLen to segmentSize
     public static int[] convertSax(double[] ts, int wordLen) {
         int card = SaxOptions.getAlphabetSize();
         double rem = Math.IEEEremainder(ts.length, wordLen);

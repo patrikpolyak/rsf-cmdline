@@ -73,9 +73,8 @@ public class Main {
     Options options = new Options();
 
     options.addOption("n", "no-trees", true, "Number of trees");
-    // TODO: implement fix-sized shapelet choices --> based on timeseries and shapelet SAX words lengths?
-    options.addOption("l", "lower", true, "Lower shapelet size (fraction of length, e.g, 0.05)");
-    options.addOption("u", "upper", true, "Upper shapelet size (fraction of length, e.g, 0.8)");
+    //options.addOption("l", "lower", true, "Lower shapelet size (fraction of length, e.g, 0.05)");
+    //options.addOption("u", "upper", true, "Upper shapelet size (fraction of length, e.g, 0.8)");
     options.addOption("r", "sample", true, "Number of shapelets");
     options.addOption("p", "print-shapelets", false, "Print the shapelets of the forest");
     options.addOption("m", "multivariate", false, "The given dataset is in a multivariate format");
@@ -91,13 +90,16 @@ public class Main {
     try {
       CommandLine cmd = parser.parse(options, args);
       int noTrees = Integer.parseInt(cmd.getOptionValue("n", "100"));
-      double lower = Double.parseDouble(cmd.getOptionValue("l", "0.025"));
-      double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
+      //double lower = Double.parseDouble(cmd.getOptionValue("l", "0.025"));
+      //double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
       int r = Integer.parseInt(cmd.getOptionValue("r", "100"));
-      SaxOptions.setAlphabetSize(Integer.parseInt(cmd.getOptionValue("a", "8")));
-      SaxOptions.setTsWordLength(Integer.parseInt(cmd.getOptionValue("tw", "8")));
-      SaxOptions.setShWordLength(Integer.parseInt(cmd.getOptionValue("sw", "4")));
-      SaxOptions.generateDistTable(SaxOptions.getAlphabetSize());
+      int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "8"));
+      SaxOptions.setAlphabetSize(alphabetSize);
+      int tsWordLength = Integer.parseInt(cmd.getOptionValue("tw", "8"));
+      SaxOptions.setTsWordLength(tsWordLength);
+      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "3"));
+      SaxOptions.setShWordLength(shWordLength);
+      SaxOptions.generateDistTable(alphabetSize);
       boolean print = cmd.hasOption("p");
 
       List<String> files = cmd.getArgList();
@@ -248,7 +250,7 @@ public class Main {
       int minR = -1;
       if (cmd.hasOption("o")) {
         //@formatter:off
-        double[][] lowerUpper = {
+        /*double[][] lowerUpper = {
             {0.025, 1},
             {0.025, 0.1},
             {0.025, 0.2},
@@ -289,10 +291,10 @@ public class Main {
               minOobError = measures.getDouble("oobError");
             }
           }
-        }
+        }*/
       } else {
         PatternFactory<MultivariateTimeSeries, MultivariateShapelet> patternFactory =
-            getPatternFactory(lower, upper);
+            getPatternFactory(shWordLength, tsWordLength);
 
         RandomPatternForest.Learner<MultivariateTimeSeries, Object> rsf =
             new RandomPatternForest.Learner<>(patternFactory, patternDistance, noTrees);
@@ -346,7 +348,7 @@ public class Main {
   }
 
   private static PatternFactory<MultivariateTimeSeries, MultivariateShapelet> getPatternFactory(
-      final double lowFrac, final double uppFrac) {
+      final int shapeletSAXLength, final int tsSAXLength) {
     return new PatternFactory<MultivariateTimeSeries, MultivariateShapelet>() {
 
       /**
@@ -362,7 +364,7 @@ public class Main {
         int randomDim = random.nextInt(mts.dimensions());
         TimeSeries uts = mts.getDimension(randomDim);
         int timeSeriesLength = uts.size();
-        int upper = (int) Math.round(timeSeriesLength * uppFrac);
+        /*int upper = (int) Math.round(timeSeriesLength * uppFrac);
         int lower = (int) Math.round(timeSeriesLength * lowFrac);
         if (lower < 2) {
           lower = 2;
@@ -378,7 +380,12 @@ public class Main {
           return null;
         }
 
-        int length = ThreadLocalRandom.current().nextInt(upper) + lower;
+        int length = ThreadLocalRandom.current().nextInt(upper) + lower;*/
+        // TODO: allow variable shapelet sizes, shapeletSAXLength being the upper limit of them
+        // i.e. shapeletSAXLength = 4 -> lengths of 1..4 are allowed
+        // i.e. segmentSize = 8 -> ts lengths of 8, 16, 24, 32 are used
+        double segmentSize = (double) timeSeriesLength / tsSAXLength;
+        int length = (int) (segmentSize * shapeletSAXLength);
         int start = ThreadLocalRandom.current().nextInt(timeSeriesLength - length);
         return new MultivariateShapelet(randomDim,
             new IndexSortedNormalizedShapelet(start, length, uts));
