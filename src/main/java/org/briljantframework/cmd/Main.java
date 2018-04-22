@@ -107,6 +107,9 @@ public class Main {
         throw new RuntimeException("Training/testing data missing");
       }
 
+      int testLength = 0;
+      int testNumTs = 0;
+
       // Compute the minimum distance between the shapelet and the time series
       /*PatternDistance<MultivariateTimeSeries, MultivariateShapelet> patternDistance =
           new PatternDistance<MultivariateTimeSeries, MultivariateShapelet>() {
@@ -195,6 +198,8 @@ public class Main {
         } else {
           train = readData(files.get(0));
           test = readData(files.get(1));
+          testNumTs = test.getKey().size();
+          testLength = test.getKey().get(0).getDimension(0).size();
         }
         // validator = ClassifierValidator.holdoutValidator(test.getFirst(), test.getSecond());
         validator = new ClassifierValidator<MultivariateTimeSeries, Object>(
@@ -323,22 +328,33 @@ public class Main {
         System.out.println("Parameters");
         System.out.println("**********");
         for (Option o : cmd.getOptions()) {
-          System.out.printf("%s:  %s\n", o.getLongOpt(), o.getValue("[default]"));
+          System.out.printf("%s:  %s%n", o.getLongOpt(), o.getValue("[default]"));
         }
         if (files.size() == 2) {
-          System.out.printf("Training data '%s'\n", files.get(0));
-          System.out.printf("Testing data  '%s'\n", files.get(1));
+          System.out.printf("Training data '%s'%n", files.get(0));
+          System.out.printf("Training data time series number: %d%n", train.getKey().size());
+          System.out.printf("Training data time series length: %d%n", train.getKey().get(0).getDimension(0).size());
+          System.out.printf("Testing data  '%s'%n", files.get(1));
+          System.out.printf("Testing data time series number: %d%n", testNumTs);
+          System.out.printf("Testing data time series length: %d%n", testLength);
+
         }
+        System.out.println(" ---- ---- ---- ---- ");
+        System.out.printf("Number of trees: %d%n", noTrees);
+        System.out.printf("Number of shapelets per node: %d%n", r);
+        System.out.printf("Timeseries SAX word length: %d%n", tsWordLength);
+        System.out.printf("Shapelet SAX word length: %d%n", shWordLength);
+        System.out.printf("SAX alphabet size: %d%n", tsWordLength);
         System.out.println(" ---- ---- ---- ---- ");
 
         System.out.println("\nResults");
         System.out.println("*******");
         for (Object key : measures.index()) {
-          System.out.printf("%s:  %.4f\n", key, measures.getDouble(key));
+          System.out.printf("%s:  %.4f%n", key, measures.getDouble(key));
         }
         System.out.println(" ---- ---- ---- ---- ");
-        System.out.printf("Runtime (training)  %.2f ms (CPU TIME)\n", result.getFitTime());
-        System.out.printf("Runtime (testing)   %.2f ms (CPU TIME)\n", result.getPredictTime());
+        System.out.printf("Runtime (training)  %.2f ms (CPU TIME)%n", result.getFitTime());
+        System.out.printf("Runtime (testing)   %.2f ms (CPU TIME)%n", result.getPredictTime());
       }
     } catch (Exception e) {
       HelpFormatter formatter = new HelpFormatter();
