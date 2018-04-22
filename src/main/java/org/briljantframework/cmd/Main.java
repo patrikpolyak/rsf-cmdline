@@ -97,7 +97,7 @@ public class Main {
       SaxOptions.setAlphabetSize(alphabetSize);
       int tsWordLength = Integer.parseInt(cmd.getOptionValue("tw", "8"));
       SaxOptions.setTsWordLength(tsWordLength);
-      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "3"));
+      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "4"));
       SaxOptions.setShWordLength(shWordLength);
       SaxOptions.generateDistTable(alphabetSize);
       boolean print = cmd.hasOption("p");
