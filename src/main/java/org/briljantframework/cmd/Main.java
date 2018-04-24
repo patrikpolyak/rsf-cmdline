@@ -34,6 +34,7 @@ import org.briljantframework.mimir.evaluation.partition.Partition;
 import org.briljantframework.mimir.evaluation.partition.Partitioner;
 import org.briljantframework.mimir.shapelet.IndexSortedNormalizedShapelet;
 import org.briljantframework.mimir.shapelet.MultivariateShapelet;
+import org.briljantframework.mimir.shapelet.NormalizedShapelet;
 import org.briljantframework.mimir.shapelet.Shapelet;
 import org.briljantframework.util.sort.ElementSwapper;
 
@@ -59,9 +60,19 @@ public class Main {
     //args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
     //        "dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
-
-    args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
-            "dataset/synthetic_control/synthetic_control_TEST"};
+    // TODO: move experiments to a separate file/class
+    //args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
+    //        "dataset/synthetic_control/synthetic_control_TEST"};
+    args = new String[] {"/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TRAIN",
+            "/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TEST"};
+    args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-tw", "64", "-sw", "16",
+            "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TRAIN",
+            "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TEST"};
+    //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TRAIN",
+    //        "/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TEST"};
+    //args = new String[] {"-n", "500", "-r", "500", "-a", "32", "-tw", "8", "-sw", "8",
+    //        "/Users/ppo/Documents/Thesis/dataset/ItalyPowerDemand/ItalyPowerDemand_TRAIN",
+    //        "/Users/ppo/Documents/Thesis/dataset/ItalyPowerDemand/ItalyPowerDemand_TEST"};
 
     // String s = "-r 10 -s 0.3 -m -w /Users/isak/Downloads/dataSets/Cricket/xleft.txt
     // /Users/isak/Downloads/dataSets/Cricket/xright.txt
@@ -89,15 +100,15 @@ public class Main {
     CommandLineParser parser = new DefaultParser();
     try {
       CommandLine cmd = parser.parse(options, args);
-      int noTrees = Integer.parseInt(cmd.getOptionValue("n", "100"));
+      int noTrees = Integer.parseInt(cmd.getOptionValue("n", "500"));
       //double lower = Double.parseDouble(cmd.getOptionValue("l", "0.025"));
       //double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
-      int r = Integer.parseInt(cmd.getOptionValue("r", "100"));
-      int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "8"));
+      int r = Integer.parseInt(cmd.getOptionValue("r", "500"));
+      int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "256"));
       SaxOptions.setAlphabetSize(alphabetSize);
-      int tsWordLength = Integer.parseInt(cmd.getOptionValue("tw", "8"));
+      int tsWordLength = Integer.parseInt(cmd.getOptionValue("tw", "15"));
       SaxOptions.setTsWordLength(tsWordLength);
-      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "4"));
+      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "15"));
       SaxOptions.setShWordLength(shWordLength);
       SaxOptions.generateDistTable(alphabetSize);
       boolean print = cmd.hasOption("p");
@@ -315,7 +326,9 @@ public class Main {
           /*for (int j = 0; j < shapelet.size(); j++) {
             System.out.print(shapelet.getDouble(j) + " ");
           }*/
-          System.out.println(shapelet.size());
+          //System.out.println(shapelet.size());
+          System.out.println(shapelet.size() + "\t");
+          System.out.println(((NormalizedShapelet) shapelets.get(i).getShapelet()).getNormalizedSaxWord().length);
         }
       }
 
@@ -344,7 +357,7 @@ public class Main {
         System.out.printf("Number of shapelets per node: %d%n", r);
         System.out.printf("Timeseries SAX word length: %d%n", tsWordLength);
         System.out.printf("Shapelet SAX word length: %d%n", shWordLength);
-        System.out.printf("SAX alphabet size: %d%n", tsWordLength);
+        System.out.printf("SAX alphabet size: %d%n", alphabetSize);
         System.out.println(" ---- ---- ---- ---- ");
 
         System.out.println("\nResults");
@@ -375,7 +388,7 @@ public class Main {
       public MultivariateShapelet createPattern(Input<? extends MultivariateTimeSeries> inputs,
           ClassSet classSet) {
         MultivariateTimeSeries mts =
-            inputs.get(classSet.getRandomSample().getRandomExample().getIndex());
+                inputs.get(classSet.getRandomSample().getRandomExample().getIndex());
         ThreadLocalRandom random = ThreadLocalRandom.current();
         int randomDim = random.nextInt(mts.dimensions());
         TimeSeries uts = mts.getDimension(randomDim);
@@ -397,14 +410,18 @@ public class Main {
         }
 
         int length = ThreadLocalRandom.current().nextInt(upper) + lower;*/
-        // TODO: allow variable shapelet sizes, shapeletSAXLength being the upper limit of them
+        // TODO: allow specifying a lower limit for shapelet sizes
         // i.e. shapeletSAXLength = 4 -> lengths of 1..4 are allowed
         // i.e. segmentSize = 8 -> ts lengths of 8, 16, 24, 32 are used
         double segmentSize = (double) timeSeriesLength / tsSAXLength;
-        int length = (int) (segmentSize * shapeletSAXLength);
-        int start = ThreadLocalRandom.current().nextInt(timeSeriesLength - length);
+        int randShapeletSAXLength = ThreadLocalRandom.current().nextInt(shapeletSAXLength) + 1;
+        int length = (int) Math.round(segmentSize * randShapeletSAXLength);
+        int start = 0;
+        if (timeSeriesLength != length) {
+          start = ThreadLocalRandom.current().nextInt(timeSeriesLength - length);
+        }
         return new MultivariateShapelet(randomDim,
-            new IndexSortedNormalizedShapelet(start, length, uts));
+            new IndexSortedNormalizedShapelet(start, length, uts, randShapeletSAXLength));
       }
     };
   }

@@ -35,7 +35,7 @@ public class NormalizedShapelet extends Shapelet {
   private final double mean;
   private int[] normalizedSaxWord;
 
-  public NormalizedShapelet(int start, int length, DoubleSequence timeSeries) {
+  public NormalizedShapelet(int start, int length, DoubleSequence timeSeries, int shapeletSize) {
     super(start, length, timeSeries);
     double[] shapelet = new double[length];
     if (timeSeries instanceof NormalizedShapelet) {
@@ -60,7 +60,7 @@ public class NormalizedShapelet extends Shapelet {
       for (int i = 0; i < length; i++) {
         shapelet[i] = (timeSeries.getDouble(start + i) - mean) / sigma;
       }
-      this.normalizedSaxWord = Sax.convertSax(shapelet, SaxOptions.getShWordLength());
+      this.normalizedSaxWord = Sax.convertSax(shapelet, shapeletSize);
     }
   }
 
