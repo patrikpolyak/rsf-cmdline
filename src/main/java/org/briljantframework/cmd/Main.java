@@ -65,7 +65,7 @@ public class Main {
     //        "dataset/synthetic_control/synthetic_control_TEST"};
     args = new String[] {"/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TRAIN",
             "/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TEST"};
-    args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-tw", "64", "-sw", "16",
+    args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-t", "64", "-l", "60", "-u", "62",
             "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TRAIN",
             "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TEST"};
     //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TRAIN",
@@ -95,8 +95,9 @@ public class Main {
     options.addOption("o", "optimize", false, "optimize the parameters using oob");
     options.addOption("d", "csv-delim", false, "Present the results as a comma separated list");
     options.addOption("a", "alphabet-size", true, "Alphabet size for the SAX conversion");
-    options.addOption("tw", "ts-wordlength", true, "Word length for the time series SAX convsersion");
-    options.addOption("sw", "sh-wordlength", true, "Word length for the shapelet SAX convsersion");
+    options.addOption("t", "ts-wordlength", true, "Word length for the time series SAX convsersion");
+    options.addOption("l", "lower", true, "Lower limit of word length for the shapelet SAX convsersion");
+    options.addOption("u", "upper", true, "Upper limit of word length for the shapelet SAX convsersion");
     CommandLineParser parser = new DefaultParser();
     try {
       CommandLine cmd = parser.parse(options, args);
@@ -106,10 +107,13 @@ public class Main {
       int r = Integer.parseInt(cmd.getOptionValue("r", "500"));
       int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "256"));
       SaxOptions.setAlphabetSize(alphabetSize);
-      int tsWordLength = Integer.parseInt(cmd.getOptionValue("tw", "15"));
+      int tsWordLength = Integer.parseInt(cmd.getOptionValue("t", "15"));
       SaxOptions.setTsWordLength(tsWordLength);
-      int shWordLength = Integer.parseInt(cmd.getOptionValue("sw", "15"));
-      SaxOptions.setShWordLength(shWordLength);
+      // lower shapelet size can't be lower than 2 - possibly due to z-normalization?
+      int lowerWordLength = Integer.parseInt(cmd.getOptionValue("l", "2"));
+      SaxOptions.setLowerWordLength(lowerWordLength);
+      int upperWordLength = Integer.parseInt(cmd.getOptionValue("u", "15"));
+      SaxOptions.setUpperWordLength(upperWordLength);
       SaxOptions.generateDistTable(alphabetSize);
       boolean print = cmd.hasOption("p");
 
@@ -310,7 +314,7 @@ public class Main {
         }*/
       } else {
         PatternFactory<MultivariateTimeSeries, MultivariateShapelet> patternFactory =
-            getPatternFactory(shWordLength, tsWordLength);
+            getPatternFactory(lowerWordLength, upperWordLength, tsWordLength);
 
         RandomPatternForest.Learner<MultivariateTimeSeries, Object> rsf =
             new RandomPatternForest.Learner<>(patternFactory, patternDistance, noTrees);
@@ -356,7 +360,8 @@ public class Main {
         System.out.printf("Number of trees: %d%n", noTrees);
         System.out.printf("Number of shapelets per node: %d%n", r);
         System.out.printf("Timeseries SAX word length: %d%n", tsWordLength);
-        System.out.printf("Shapelet SAX word length: %d%n", shWordLength);
+        System.out.printf("Lower limit of shapelet SAX word length: %d%n", lowerWordLength);
+        System.out.printf("Upper limit of shapelet SAX word length: %d%n", upperWordLength);
         System.out.printf("SAX alphabet size: %d%n", alphabetSize);
         System.out.println(" ---- ---- ---- ---- ");
 
@@ -377,7 +382,7 @@ public class Main {
   }
 
   private static PatternFactory<MultivariateTimeSeries, MultivariateShapelet> getPatternFactory(
-      final int shapeletSAXLength, final int tsSAXLength) {
+      final int lowerShapeletSAXLength, final int upperShapeletSAXLength, final int tsSAXLength) {
     return new PatternFactory<MultivariateTimeSeries, MultivariateShapelet>() {
 
       /**
@@ -410,11 +415,8 @@ public class Main {
         }
 
         int length = ThreadLocalRandom.current().nextInt(upper) + lower;*/
-        // TODO: allow specifying a lower limit for shapelet sizes
-        // i.e. shapeletSAXLength = 4 -> lengths of 1..4 are allowed
-        // i.e. segmentSize = 8 -> ts lengths of 8, 16, 24, 32 are used
         double segmentSize = (double) timeSeriesLength / tsSAXLength;
-        int randShapeletSAXLength = ThreadLocalRandom.current().nextInt(shapeletSAXLength) + 1;
+        int randShapeletSAXLength = lowerShapeletSAXLength + ThreadLocalRandom.current().nextInt(upperShapeletSAXLength - lowerShapeletSAXLength + 1);
         int length = (int) Math.round(segmentSize * randShapeletSAXLength);
         int start = 0;
         if (timeSeriesLength != length) {

@@ -12,7 +12,9 @@ public class SaxOptions {
     private static double[][] distTable;
     private static int alphabetSize;
     private static int tsWordLength;
-    private static int shWordLength;
+    private static int lowerWordLength;
+    private static int upperWordLength;
+
 
     public static int getAlphabetSize() {
         return alphabetSize;
@@ -30,12 +32,12 @@ public class SaxOptions {
         SaxOptions.tsWordLength = word_length;
     }
 
-    public static int getShWordLength() {
-        return shWordLength;
+    public static int getLowerWordLength() {
+        return lowerWordLength;
     }
 
-    public static void setShWordLength(int shWordLength) {
-        SaxOptions.shWordLength = shWordLength;
+    public static void setLowerWordLength(int lowerWordLength) {
+        SaxOptions.lowerWordLength = lowerWordLength;
     }
 
     public static double[][] getDistTable() {
@@ -54,6 +56,14 @@ public class SaxOptions {
                 }
             }
         }
+    }
+
+    public static int getUpperWordLength() {
+        return upperWordLength;
+    }
+
+    public static void setUpperWordLength(int upperWordLength) {
+        SaxOptions.upperWordLength = upperWordLength;
     }
 
     /*
