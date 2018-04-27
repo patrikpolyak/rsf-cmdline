@@ -36,12 +36,14 @@ public class IndexSortedNormalizedShapelet extends NormalizedShapelet {
     if (vector instanceof IndexSortedNormalizedShapelet) {
       this.order = ((IndexSortedNormalizedShapelet) vector).getSortOrder();
     } else {
-      this.order = indexSort(size(),
-          (i, j) -> Double.compare(Math.abs(getDouble(j)), Math.abs(getDouble(i))));
+      /*this.order = indexSort(size(),
+          (i, j) -> Double.compare(Math.abs(getDouble(j)), Math.abs(getDouble(i))));*/
+      int[] normalizedSaxWord = getNormalizedSaxWord();
+      this.order = indexSort(normalizedSaxWord.length,
+              (i, j) -> Integer.compare(normalizedSaxWord[j], normalizedSaxWord[i]));
     }
   }
 
-  // TODO: might need to change this given the usage of SAX words vs timeseries
   private int[] indexSort(int size, IntBinaryOperator operator) {
     int[] indicies = new int[size];
     for (int i = 0; i < indicies.length; i++) {
