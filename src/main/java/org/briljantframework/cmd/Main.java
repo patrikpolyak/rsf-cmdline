@@ -65,7 +65,7 @@ public class Main {
     //        "dataset/synthetic_control/synthetic_control_TEST"};
     //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TRAIN",
     //        "/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TEST"};
-    //args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-t", "64", "-l", "60", "-u", "62",
+    //args = new String[] {"-p", "-n", "100", "-r", "50", "-a", "24", "-t", "64", "-l", "0", "-u", "0.1",
     //        "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TRAIN",
     //        "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TEST"};
     //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TRAIN",
@@ -330,7 +330,7 @@ public class Main {
         //shapelets.sort((a, b) -> Integer.compare(a.getShapelet().size(), b.getShapelet().size()));
         System.out.println("Shapelet size distribution");
         System.out.println("**************************");
-        Map<Integer, Integer> shapeletCount = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> shapeletCount = new TreeMap<Integer, Integer>();
         for (int i = 0; i < shapelets.size(); i++) {
           //System.out.print(i + "\t");
           Shapelet shapelet = shapelets.get(i).getShapelet();
