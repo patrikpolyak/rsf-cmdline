@@ -57,17 +57,17 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    //args = new String[] {"-n", "100", "-l", "0.025", "-u", "1", "-r", "10",
-    //        "dataset/synthetic_control/synthetic_control_TRAIN",
-    //        "dataset/synthetic_control/synthetic_control_TEST"};
+    args = new String[] {"-p", "-n", "100", "-a", "24", "-t", "30", "-l", "0", "-u", "1", "-r", "10",
+            "dataset/synthetic_control/synthetic_control_TRAIN",
+            "dataset/synthetic_control/synthetic_control_TEST"};
     // TODO: move experiments to a separate file/class
     //args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
-    args = new String[] {"/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TRAIN",
-            "/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TEST"};
-    args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-t", "64", "-l", "60", "-u", "62",
-            "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TRAIN",
-            "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TEST"};
+    //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TRAIN",
+    //        "/Users/ppo/Documents/Thesis/dataset/ElectricDevices/ElectricDevices_TEST"};
+    //args = new String[] {"-n", "500", "-r", "50", "-a", "24", "-t", "64", "-l", "60", "-u", "62",
+    //        "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TRAIN",
+    //        "/Users/ppo/Documents/Thesis/dataset/BeetleFly/BeetleFly_TEST"};
     //args = new String[] {"/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TRAIN",
     //        "/Users/ppo/Documents/Thesis/dataset/Adiac/Adiac_TEST"};
     //args = new String[] {"-n", "500", "-r", "500", "-a", "32", "-tw", "8", "-sw", "8",
@@ -101,25 +101,29 @@ public class Main {
     CommandLineParser parser = new DefaultParser();
     try {
       CommandLine cmd = parser.parse(options, args);
-      int noTrees = Integer.parseInt(cmd.getOptionValue("n", "500"));
+      int noTrees = Integer.parseInt(cmd.getOptionValue("n", "100"));
       //double lower = Double.parseDouble(cmd.getOptionValue("l", "0.025"));
       //double upper = Double.parseDouble(cmd.getOptionValue("u", "1"));
-      int r = Integer.parseInt(cmd.getOptionValue("r", "500"));
-      int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "256"));
+      int r = Integer.parseInt(cmd.getOptionValue("r", "10"));
+      int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "16"));
       SaxOptions.setAlphabetSize(alphabetSize);
       int tsWordLength = Integer.parseInt(cmd.getOptionValue("t", "15"));
       SaxOptions.setTsWordLength(tsWordLength);
       // lower shapelet size can't be lower than 2 - possibly due to z-normalization?
-      int lowerWordLength = Integer.parseInt(cmd.getOptionValue("l", "2"));
+      //int lowerWordLength = Integer.parseInt(cmd.getOptionValue("l", "2"));
+      double lowerWordLength = Double.parseDouble(cmd.getOptionValue("l", "0"));
       SaxOptions.setLowerWordLength(lowerWordLength);
-      int upperWordLength = Integer.parseInt(cmd.getOptionValue("u", "15"));
+      //int upperWordLength = Integer.parseInt(cmd.getOptionValue("u", "15"));
+      double upperWordLength = Double.parseDouble(cmd.getOptionValue("u", "1"));
       SaxOptions.setUpperWordLength(upperWordLength);
       SaxOptions.generateDistTable(alphabetSize);
       boolean print = cmd.hasOption("p");
 
       List<String> files = cmd.getArgList();
       if (files == null || files.isEmpty()) {
-        throw new RuntimeException("Training/testing data missing");
+        //throw new RuntimeException("Training/testing data missing");
+        files.add("dataset/synthetic_control/synthetic_control_TRAIN");
+        files.add("dataset/synthetic_control/synthetic_control_TEST");
       }
 
       int testLength = 0;
@@ -323,17 +327,32 @@ public class Main {
       }
 
       if (print) {
-        shapelets.sort((a, b) -> Integer.compare(a.getShapelet().size(), b.getShapelet().size()));
+        //shapelets.sort((a, b) -> Integer.compare(a.getShapelet().size(), b.getShapelet().size()));
+        System.out.println("Shapelet size distribution");
+        System.out.println("**************************");
+        Map<Integer, Integer> shapeletCount = new HashMap<Integer, Integer>();
         for (int i = 0; i < shapelets.size(); i++) {
-          System.out.print(i + "\t");
+          //System.out.print(i + "\t");
           Shapelet shapelet = shapelets.get(i).getShapelet();
           /*for (int j = 0; j < shapelet.size(); j++) {
             System.out.print(shapelet.getDouble(j) + " ");
           }*/
+          int l = ((NormalizedShapelet) shapelets.get(i).getShapelet()).getNormalizedSaxWord().length;
+          if (shapeletCount.containsKey(l)) {
+              shapeletCount.put(l, shapeletCount.get(l)+1);
+          } else {
+              shapeletCount.put(l, 1);
+          }
           //System.out.println(shapelet.size());
-          System.out.println(shapelet.size() + "\t");
-          System.out.println(((NormalizedShapelet) shapelets.get(i).getShapelet()).getNormalizedSaxWord().length);
+          //System.out.println(shapelet.size() + "\t");
+          //System.out.println(((NormalizedShapelet) shapelets.get(i).getShapelet()).getNormalizedSaxWord().length);
         }
+        for (Map.Entry<Integer, Integer> entry : shapeletCount.entrySet()) {
+          int key = entry.getKey();
+          int value = entry.getValue();
+          System.out.println(key + "\t" + value);
+        }
+        System.out.println("");
       }
 
       Series measures = result.getMeasures().reduce(Series::mean);
@@ -360,8 +379,8 @@ public class Main {
         System.out.printf("Number of trees: %d%n", noTrees);
         System.out.printf("Number of shapelets per node: %d%n", r);
         System.out.printf("Timeseries SAX word length: %d%n", tsWordLength);
-        System.out.printf("Lower limit of shapelet SAX word length: %d%n", lowerWordLength);
-        System.out.printf("Upper limit of shapelet SAX word length: %d%n", upperWordLength);
+        System.out.printf("Lower limit of shapelet SAX word length: %.2f%n", lowerWordLength);
+        System.out.printf("Upper limit of shapelet SAX word length: %.2f%n", upperWordLength);
         System.out.printf("SAX alphabet size: %d%n", alphabetSize);
         System.out.println(" ---- ---- ---- ---- ");
 
@@ -382,7 +401,7 @@ public class Main {
   }
 
   private static PatternFactory<MultivariateTimeSeries, MultivariateShapelet> getPatternFactory(
-      final int lowerShapeletSAXLength, final int upperShapeletSAXLength, final int tsSAXLength) {
+      final double lowerShapeletSAXLength, final double upperShapeletSAXLength, final int tsSAXLength) {
     return new PatternFactory<MultivariateTimeSeries, MultivariateShapelet>() {
 
       /**
@@ -398,13 +417,13 @@ public class Main {
         int randomDim = random.nextInt(mts.dimensions());
         TimeSeries uts = mts.getDimension(randomDim);
         int timeSeriesLength = uts.size();
-        /*int upper = (int) Math.round(timeSeriesLength * uppFrac);
-        int lower = (int) Math.round(timeSeriesLength * lowFrac);
+        int upper = (int) Math.round(tsSAXLength * upperShapeletSAXLength);
+        int lower = (int) Math.round(tsSAXLength * lowerShapeletSAXLength);
         if (lower < 2) {
           lower = 2;
         }
 
-        if (Math.addExact(upper, lower) > timeSeriesLength) {
+        /*if (Math.addExact(upper, lower) > timeSeriesLength) {
           upper = timeSeriesLength - lower;
         }
         if (lower == upper) {
@@ -416,7 +435,7 @@ public class Main {
 
         int length = ThreadLocalRandom.current().nextInt(upper) + lower;*/
         double segmentSize = (double) timeSeriesLength / tsSAXLength;
-        int randShapeletSAXLength = lowerShapeletSAXLength + ThreadLocalRandom.current().nextInt(upperShapeletSAXLength - lowerShapeletSAXLength + 1);
+        int randShapeletSAXLength = (lower + ThreadLocalRandom.current().nextInt(upper - lower + 1));
         int length = (int) Math.round(segmentSize * randShapeletSAXLength);
         int start = 0;
         if (timeSeriesLength != length) {
