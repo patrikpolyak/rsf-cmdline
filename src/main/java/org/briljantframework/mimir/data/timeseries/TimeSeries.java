@@ -39,7 +39,7 @@ public class TimeSeries implements DoubleSequence {
 
   private TimeSeries(double[] buffer) {
     this.buffer = buffer;
-    this.saxWord = Sax.convertSax(buffer, SaxOptions.getTsWordLength());
+    this.saxWord = Sax.convertSax(buffer, (int) (SaxOptions.getTsWordLength() * buffer.length));
   }
 
   public static TimeSeries copyOf(Collection<?> data) {
