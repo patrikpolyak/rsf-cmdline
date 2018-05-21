@@ -57,7 +57,8 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    //args = new String[] {"-p", "-n", "100", "-a", "24", "-t", "0.05", "-l", "0.05", "-u", "0.05", "-r", "10",
+
+    //args = new String[] {"-p", "-n", "100", "-a", "24", "-t", "30", "-l", "0", "-u", "1", "-r", "10",
     //        "dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
     // TODO: move experiments to a separate file/class
@@ -107,8 +108,7 @@ public class Main {
       int r = Integer.parseInt(cmd.getOptionValue("r", "10"));
       int alphabetSize = Integer.parseInt(cmd.getOptionValue("a", "16"));
       SaxOptions.setAlphabetSize(alphabetSize);
-      //int tsWordLength = Integer.parseInt(cmd.getOptionValue("t", "15"));
-      double tsWordLength = Double.parseDouble(cmd.getOptionValue("t", "1"));
+      int tsWordLength = Integer.parseInt(cmd.getOptionValue("t", "15"));
       SaxOptions.setTsWordLength(tsWordLength);
       // lower shapelet size can't be lower than 2 - possibly due to z-normalization?
       //int lowerWordLength = Integer.parseInt(cmd.getOptionValue("l", "2"));
@@ -362,6 +362,7 @@ public class Main {
         // accuracy, aucRoc, totalFitTime, totalPredictTime, lu, r
         //System.out.println(measures.get("accuracy") + "," + measures.get("aucRoc") + "," + totalFitTime + "," + totalPredictTime + "," + Arrays.toString(minLu) + "," + minR);
         System.out.printf("%d;%d;%d;%s;%s;%s;%s;%s%n", noTrees, r, alphabetSize, tsWordLength, lowerWordLength, upperWordLength, measures.get("accuracy").toString(), (Double.toString(result.getPredictTime())));
+
       } else {
         System.out.println("Parameters");
         System.out.println("**********");
@@ -380,7 +381,7 @@ public class Main {
         System.out.println(" ---- ---- ---- ---- ");
         System.out.printf("Number of trees: %d%n", noTrees);
         System.out.printf("Number of shapelets per node: %d%n", r);
-        System.out.printf("Timeseries SAX word length: %.2f%n", tsWordLength);
+        System.out.printf("Timeseries SAX word length: %d%n", tsWordLength);
         System.out.printf("Lower limit of shapelet SAX word length: %.2f%n", lowerWordLength);
         System.out.printf("Upper limit of shapelet SAX word length: %.2f%n", upperWordLength);
         System.out.printf("SAX alphabet size: %d%n", alphabetSize);
@@ -403,7 +404,7 @@ public class Main {
   }
 
   private static PatternFactory<MultivariateTimeSeries, MultivariateShapelet> getPatternFactory(
-      final double lowerShapeletSAXLength, final double upperShapeletSAXLength, final double tsSAXRatio) {
+      final double lowerShapeletSAXLength, final double upperShapeletSAXLength, final int tsSAXLength) {
     return new PatternFactory<MultivariateTimeSeries, MultivariateShapelet>() {
 
       /**
@@ -419,7 +420,6 @@ public class Main {
         int randomDim = random.nextInt(mts.dimensions());
         TimeSeries uts = mts.getDimension(randomDim);
         int timeSeriesLength = uts.size();
-        int tsSAXLength = (int) Math.round(tsSAXRatio * timeSeriesLength);
         int upper = (int) Math.round(tsSAXLength * upperShapeletSAXLength);
         int lower = (int) Math.round(tsSAXLength * lowerShapeletSAXLength);
         if (lower < 2) {

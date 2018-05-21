@@ -11,7 +11,7 @@ public class SaxOptions {
     private static Map<Integer, double[]> breakpoints = new HashMap<Integer, double[]>();
     private static double[][] distTable;
     private static int alphabetSize;
-    private static double tsWordLength;
+    private static int tsWordLength;
     private static double lowerWordLength;
     private static double upperWordLength;
 
@@ -24,11 +24,11 @@ public class SaxOptions {
         SaxOptions.alphabetSize = alphabet_size;
     }
 
-    public static double getTsWordLength() {
+    public static int getTsWordLength() {
         return tsWordLength;
     }
 
-    public static void setTsWordLength(double word_length) {
+    public static void setTsWordLength(int word_length) {
         SaxOptions.tsWordLength = word_length;
     }
 
