@@ -57,9 +57,9 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    args = new String[] {"-p", "-n", "100", "-a", "24", "-t", "0.5", "-l", "1", "-u", "1", "-r", "10",
-            "dataset/synthetic_control/synthetic_control_TRAIN",
-            "dataset/synthetic_control/synthetic_control_TEST"};
+    //args = new String[] {"-p", "-n", "100", "-a", "24", "-t", "0.05", "-l", "0.05", "-u", "0.05", "-r", "10",
+    //        "dataset/synthetic_control/synthetic_control_TRAIN",
+    //        "dataset/synthetic_control/synthetic_control_TEST"};
     // TODO: move experiments to a separate file/class
     //args = new String[] {"dataset/synthetic_control/synthetic_control_TRAIN",
     //        "dataset/synthetic_control/synthetic_control_TEST"};
@@ -361,7 +361,7 @@ public class Main {
         // Format as csv
         // accuracy, aucRoc, totalFitTime, totalPredictTime, lu, r
         //System.out.println(measures.get("accuracy") + "," + measures.get("aucRoc") + "," + totalFitTime + "," + totalPredictTime + "," + Arrays.toString(minLu) + "," + minR);
-        System.out.printf("%d;%d;%d;%d;%s;%s;%s;%s%n", noTrees, r, alphabetSize, tsWordLength, lowerWordLength, upperWordLength, measures.get("accuracy").toString().replace(".", ","), (Double.toString(result.getPredictTime())).replace(".", ","));
+        System.out.printf("%d;%d;%d;%s;%s;%s;%s;%s%n", noTrees, r, alphabetSize, tsWordLength, lowerWordLength, upperWordLength, measures.get("accuracy").toString(), (Double.toString(result.getPredictTime())));
       } else {
         System.out.println("Parameters");
         System.out.println("**********");
